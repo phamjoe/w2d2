@@ -11,19 +11,53 @@ var urlDatabase = {
   '9sm5xK': 'http://www.google.com'
 };
 
+let users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "123"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "123"
+  }
+}
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(methodOverride('_method'));
 app.use(cookieParser());
 
-//  login with username
+
+//  login with user_id
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+  const found = Object.values(users).find(user => user.email === req.body.email);
+  if(found){
+    if (found.password === req.body.password) {
+      res.cookie('user_id', found.id);
+      res.redirect('/urls');
+    }
+    else{
+      res.sendStatus(403).send('Bad Request');
+    }
+  }
+  else{
+      res.sendStatus(403).send('Bad Request');
+  }
+});
+
+//  login page
+app.get('/urls/login', (req, res) => {
+  let templateVars = {
+    user : users[req.cookies['user_id']],
+    urls: urlDatabase
+  };
+  res.render('urls_login', templateVars);
 });
 
 // logout and clear cookies
 app.post('/logout', (req, res) => {
-  res.clearCookie('username', req.body.username);
+  res.clearCookie('user_id', req.body.user_id);
   res.redirect('/urls');
 })
 
@@ -33,26 +67,56 @@ app.get('/', (req, res) => {
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
+
 app.get('/urls', (req, res) => {
   let templateVars = {
-    username: req.cookies['username'],
-    urls: urlDatabase
+    user : users[req.cookies['user_id']],
+    urls : urlDatabase
   };
   res.render('urls_index', templateVars);
 });
+
 //  page to add new link
 app.get('/urls/new', (req, res) => {
   let templateVars = {
-    username: req.cookies.username,
+    user : users[req.cookies['user_id']],
     urls: urlDatabase,
     shortURL: req.params.id
   };
   res.render('urls_new', templateVars);
 });
+
+//  register
+app.get('/urls/register', (req, res) => {
+    let templateVars = {
+      user : users[req.cookies['user_id']],
+    };
+
+  res.render('urls_register', templateVars);
+});
+
+app.post('/register', (req, res) => {
+  const found = Object.values(users).find(user => user.email === req.body.email);
+  if(!req.body.email || !req.body.password || found){
+    res.sendStatus(400);
+  }
+  else{
+    const new_id = generateRandomString();
+    users[new_id] = {
+        id: new_id,
+        email: req.body.email,
+        password: req.body.password
+    }
+    res.cookie('user_id', new_id);
+
+    res.redirect(301, '/urls');
+  }
+});
+
 //  find by id
 app.get('/urls/:id', (req, res) => {
   let templateVars = {
-    username: req.cookies.username,
+    user : users[req.cookies['user_id']],
     urls: urlDatabase,
     shortURL: req.params.id
   };
@@ -74,17 +138,17 @@ app.post('/urls/', (req, res) => {
 //  update user info
 app.put('/urls/:id', (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
-
   res.redirect(301, `/urls/${req.params.id}`);
 });
 
+//  redirect to long URL
 app.get('/u/:shortURL', (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`Tiny App listening on port ${PORT}!`);
 });
 
 function generateRandomString() {
