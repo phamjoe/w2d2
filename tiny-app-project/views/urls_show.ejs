@@ -10,7 +10,8 @@
     <% include ./partials/_header%>
 </header>
 <body style="font-size:16px; padding:50px;">
-    <form  method="POST" action="/urls/<%= shortURL %>?_method=PUT">
+    <form action="/urls/<%= shortURL %>?_method=PUT" method="POST">
+
       <h1>Short URL: <b><%= shortURL%></b> </h1>
       <input id="longURL" type="text" name="longURL" value="<%=urls[shortURL] %>" autofocus style="width: 300px">
       <button type="submit" class="btn btn-info">Update</button>

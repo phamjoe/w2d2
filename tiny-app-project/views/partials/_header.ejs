@@ -20,10 +20,11 @@ ul#menu li {
         </div>
         <div class="navbar-collapse collapse">
             <ul id="menu" class="nav navbar-nav navbar-right" style="margin:auto" >
-            <% if( username ){ %>
+            <% if( user ){ %>
             <li><form method="POST" action="/logout"> </li>
                 <li>
-                    <div style="padding:10px; font-size:16pt;color:white"> <%= username %>
+                    <div style="padding:10px; font-size:16pt;color:white">
+                        <%= user.email %>
                     </div>
                 </li>
                 <li>
@@ -32,16 +33,14 @@ ul#menu li {
                 </li>
                 </form>
              <% } else{ %>
-            <li><form method="POST" action="/login"> </li>
-                <li><input type="text" name="username" maxlength="25" style="margin:10px"></li>
-
+            <li>
                 <li>
-                    <div class="btn-nav" style="padding-right:10px" ><input type="submit" value="Login"class="btn btn-info btn-small navbar-btn"  ></input>
+                     <div class="btn-nav"  style="padding-right:10px" ><a class="btn btn-info btn-small navbar-btn" href="/urls/login">Login</a>
                     </div>
                 </li>
                 <li>
 
-                    <div class="btn-nav"  style="padding-right:40px" ><a class="btn btn-info btn-small navbar-btn" href="/register">Sign up!</a>
+                    <div class="btn-nav"  style="padding-right:40px" ><a class="btn btn-info btn-small navbar-btn" href="/urls/register">Sign up!</a>
                     </div>
                 </li>
                 </form>
