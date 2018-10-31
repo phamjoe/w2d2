@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const methodOverride = require('method-override')
+const methodOverride = require('method-override');
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
 app.set('view engine', 'ejs');
@@ -12,21 +13,37 @@ var urlDatabase = {
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(methodOverride('_method'));
+app.use(cookieParser());
 
+//  login with username
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
+});
+
+// logout and clear cookies
+app.post('/logout', (req, res) => {
+  res.clearCookie('username', req.body.username);
+  res.redirect('/urls');
+})
 
 app.get('/', (req, res) => {
   res.redirect(301, `/urls`);
 });
-// app.get('/urls.json', (req, res) => {
-//   res.json(urlDatabase);
-// });
+app.get('/urls.json', (req, res) => {
+  res.json(urlDatabase);
+});
 app.get('/urls', (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = {
+    username: req.cookies['username'],
+    urls: urlDatabase
+  };
   res.render('urls_index', templateVars);
 });
 //  page to add new link
 app.get('/urls/new', (req, res) => {
   let templateVars = {
+    username: req.cookies.username,
     urls: urlDatabase,
     shortURL: req.params.id
   };
@@ -35,6 +52,7 @@ app.get('/urls/new', (req, res) => {
 //  find by id
 app.get('/urls/:id', (req, res) => {
   let templateVars = {
+    username: req.cookies.username,
     urls: urlDatabase,
     shortURL: req.params.id
   };
