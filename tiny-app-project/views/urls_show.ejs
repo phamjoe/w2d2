@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<head>
+      <% include ./partials/_head %>
+</head>
+<header>
+    <% include ./partials/_header%>
+</header>
+<body style="font-size:16px; padding:50px;">
+    <form  method="POST" action="/urls/<%= shortURL %>?_method=PUT">
+      <h1>Short URL: <b><%= shortURL%></b> </h1>
+      <input id="longURL" type="text" name="longURL" value="<%=urls[shortURL] %>" autofocus style="width: 300px">
+      <button type="submit" class="btn btn-info">Update</button>
+    </form>
+</body>
+</html>

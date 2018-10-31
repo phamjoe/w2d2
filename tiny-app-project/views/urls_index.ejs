@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <% include ./partials/_head %>
+</head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<style>
+  table{
+
+    border-collapse: collapse;
+    width: 100%;
+  }
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 8px;
+    margin: auto;
+  }
+
+</style>
+<header>
+    <% include ./partials/_header %>
+</header>
+  <a href="/urls/new %>" class="btn btn-primary" style="padding:10px "> Create New Short URL </a>
+<body style="font-size:16px; padding:50px;">
+  <table>
+      <% Object.entries(urls).forEach(key => { %>
+       <tr>
+
+          <form method="POST" action="/urls/<%= key[0] %>/delete?_method=DELETE" style="margin:auto; width:50% ">
+          <td><a href="/u/<%= key[0] %>"><%= key[0] %></td> <td><%= key[1] %></td>
+          <td><a href="/urls/<%= key[0] %>" class="btn btn-info" style="width:120px"> Edit </a></td>
+          <td><button type="submit" class="btn btn-danger" style="width:120px" > Delete </button></td>
+          </form>
+      <% }) %>
+
+       </tr>
+
+  </table>
+</body>
+</html>
