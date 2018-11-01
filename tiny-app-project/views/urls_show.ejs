@@ -10,11 +10,16 @@
     <% include ./partials/_header%>
 </header>
 <body style="font-size:16px; padding:50px;">
+    <% if( urls[shortURL]) {%>
     <form action="/urls/<%= shortURL %>?_method=PUT" method="POST">
 
       <h1>Short URL: <b><%= shortURL%></b> </h1>
-      <input id="longURL" type="text" name="longURL" value="<%=urls[shortURL] %>" autofocus style="width: 300px">
+      <input id="longURL" type="text" name="longURL" value="<%=urls[shortURL].url %>" autofocus style="width: 300px">
       <button type="submit" class="btn btn-info">Update</button>
     </form>
+     <% } else{ %>
+    <p> Please Log in </p>
+     <% } %>
+
 </body>
 </html>
