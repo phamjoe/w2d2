@@ -52,6 +52,32 @@ function urlsForUser(id) {
   }
   return usersURL;
 }
+
+function generateRandomString() {
+  let random = Math.random()
+    .toString(36) //
+    .substring(7);
+  return random;
+}
+
+function getDate(){
+  var today = new Date();
+  var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  var dateTime = date+' '+time;
+
+  return dateTime;
+}
+
+function getUserID(userID){
+  if(userID){
+    return userID.id;
+  }
+  else{
+    return generateRandomString();
+  }
+}
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(methodOverride('_method'));
 app.use(
@@ -100,11 +126,9 @@ app.get('/urls', (req, res) => {
   if (!req.session.user_id) {
     res.redirect('/urls/login');
   }
-  //urlsForUser(req.cookies['user_id']);
   let templateVars = {
     user: users[req.session.user_id],
     urls: urlsForUser(req.session.user_id)
-    //urls : urlDatabase
   };
   res.render('urls_index', templateVars);
 });
@@ -112,7 +136,7 @@ app.get('/urls', (req, res) => {
 //  page to add new link
 app.get('/urls/new', (req, res) => {
   if (!req.session.user_id) {
-    res.redirect('login');
+    res.redirect('/urls/login');
   } else {
     let templateVars = {
       user: users[req.session.user_id],
@@ -136,7 +160,8 @@ app.post('/register', (req, res) => {
   const found = Object.values(users).find(user => user.email === req.body.email);
   if (!req.body.email || !req.body.password || found) {
     res.sendStatus(400);
-  } else {
+  }
+  else {
     const hashedPassword = bcrypt.hashSync(req.body.password, 10);
     const new_id = generateRandomString();
     users[new_id] = {
@@ -156,7 +181,6 @@ app.get('/urls/:id', (req, res) => {
     urls: urlsForUser(req.session.user_id),
     shortURL: req.params.id
   };
-  console.log(templateVars.urls);
   res.render('urls_show', templateVars);
 });
 
@@ -178,7 +202,6 @@ app.post('/urls/', (req, res) => {
 
 //  update URL info
 app.put('/urls/:id', (req, res) => {
-  console.log();
   urlDatabase[req.params.id].url = req.body.longURL;
   res.redirect(301, `/urls/${req.params.id}`);
 });
@@ -190,7 +213,6 @@ app.get('/u/:shortURL', (req, res) => {
   if(!urlDatabase[req.params.shortURL].allVisits){
     urlDatabase[req.params.shortURL].allVisits = [];
   }
-  console.log(users[req.session.user_id]);
   urlDatabase[req.params.shortURL].allVisits.unshift({
     user_id : getUserID(users[req.session.user_id]),
     date : getDate()
@@ -203,27 +225,3 @@ app.listen(PORT, () => {
   console.log(`Tiny App listening on port ${PORT}!`);
 });
 
-function generateRandomString() {
-  let random = Math.random()
-    .toString(36) //
-    .substring(7);
-  return random;
-}
-
-function getDate(){
-  var today = new Date();
-  var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-  var dateTime = date+' '+time;
-
-  return dateTime;
-}
-
-function getUserID(userID){
-  if(userID){
-    return userID.id;
-  }
-  else{
-    return generateRandomString();
-  }
-}
