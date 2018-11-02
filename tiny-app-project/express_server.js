@@ -11,17 +11,16 @@ let urlDatabase = {
   'b2xVn2': {
     url: 'http://www.lighthouselabs.ca',
     user_id: 'userRandomID',
-    visits : 0,
-    allVisits : [],
-    dateCreated : getDate()
-
+    visits: 0,
+    allVisits: [],
+    dateCreated: getDate()
   },
   '9sm5xK': {
     url: 'http://www.google.com',
     user_id: 'user2RandomID',
-    visits : 0,
-    allVisits : [],
-    dateCreated : getDate()
+    visits: 0,
+    allVisits: [],
+    dateCreated: getDate()
   }
 };
 
@@ -45,9 +44,9 @@ function urlsForUser(id) {
       usersURL[shortURL] = {
         url: urlDatabase[shortURL].url,
         user_id: urlDatabase[shortURL].user_id,
-        visits : urlDatabase[shortURL].visits || 0,
-        allVisits : urlDatabase[shortURL].allVisits || [],
-        dateCreated : urlDatabase[shortURL].dateCreated
+        visits: urlDatabase[shortURL].visits || 0,
+        allVisits: urlDatabase[shortURL].allVisits || [],
+        dateCreated: urlDatabase[shortURL].dateCreated
       };
     }
   }
@@ -61,20 +60,19 @@ function generateRandomString() {
   return random;
 }
 
-function getDate(){
+function getDate() {
   var today = new Date();
-  var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-  var dateTime = date+' '+time;
+  var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+  var time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+  var dateTime = date + ' ' + time;
 
   return dateTime;
 }
 
-function getUserID(userID){
-  if(userID){
+function getUserID(userID) {
+  if (userID) {
     return userID.id;
-  }
-  else{
+  } else {
     return generateRandomString();
   }
 }
@@ -155,8 +153,8 @@ app.post('/urls/', (req, res) => {
   urlDatabase[shortURL] = {
     url: req.body.longURL,
     user_id: req.session.user_id,
-    visits : 0,
-    dateCreated : getDate()
+    visits: 0,
+    dateCreated: getDate()
   };
   res.redirect(302, `/urls/${shortURL}`);
 });
@@ -169,14 +167,13 @@ app.put('/urls/:id', (req, res) => {
 
 //  register
 app.get('/urls/register', (req, res) => {
-  if(!req.session.user_id){
-  let templateVars = {
-    user: users[req.session.user_id]
-  };
+  if (!req.session.user_id) {
+    let templateVars = {
+      user: users[req.session.user_id]
+    };
 
-  res.render('urls_register', templateVars);
-  }
-  else{
+    res.render('urls_register', templateVars);
+  } else {
     res.redirect('/urls');
   }
 });
@@ -185,8 +182,7 @@ app.post('/register', (req, res) => {
   const found = Object.values(users).find(user => user.email === req.body.email);
   if (!req.body.email || !req.body.password || found) {
     res.sendStatus(400);
-  }
-  else {
+  } else {
     const hashedPassword = bcrypt.hashSync(req.body.password, 10);
     const new_id = generateRandomString();
     users[new_id] = {
@@ -218,13 +214,13 @@ app.delete('/urls/:id/delete', (req, res) => {
 //  redirect to long URL
 app.get('/u/:shortURL', (req, res) => {
   let longURL = urlDatabase[req.params.shortURL].url;
-  urlDatabase[req.params.shortURL].visits = ( urlDatabase[req.params.shortURL].visits)+1 || 0;
-  if(!urlDatabase[req.params.shortURL].allVisits){
+  urlDatabase[req.params.shortURL].visits = urlDatabase[req.params.shortURL].visits + 1 || 0;
+  if (!urlDatabase[req.params.shortURL].allVisits) {
     urlDatabase[req.params.shortURL].allVisits = [];
   }
   urlDatabase[req.params.shortURL].allVisits.unshift({
-    user_id : getUserID(users[req.session.user_id]),
-    date : getDate()
+    user_id: getUserID(users[req.session.user_id]),
+    date: getDate()
   });
 
   res.redirect(urlDatabase[req.params.shortURL].url);
