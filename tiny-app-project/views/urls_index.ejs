@@ -28,13 +28,21 @@
   <a href="/urls/new %>" class="btn btn-primary" style="padding:10px "> Create New Short URL </a>
 <body style="font-size:16px; padding:50px;">
   <table>
+    <tr>
+      <th>Short URL</th>
+       <th>Full URL</th>
+        <th>Date Created</th>
+        <th># of Visits</th>
+
+      </tr>
 
       <% Object.entries(urls).forEach(key => { %>
        <tr>
-
           <form method="POST" action="/urls/<%= key[0] %>/delete?_method=DELETE" style="margin:auto; width:50% ">
-          <td><a href="/u/<%= key[0] %>"><%= key[0] %></td> <td><%= key[1].url %></td>
-
+          <td><a href="/u/<%= key[0] %>"><%= key[0] %></td>
+          <td><%= key[1].url %></td>
+          <td><%= key[1].dateCreated %></td>
+          <td><%= key[1].visits %> </td>
           <td><a href="/urls/<%= key[0] %>" class="btn btn-info" style="width:120px"> Edit </a></td>
           <td><button type="submit" class="btn btn-danger" style="width:120px" > Delete </button></td>
           </form>
