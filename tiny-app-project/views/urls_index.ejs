@@ -33,6 +33,7 @@
        <th>Full URL</th>
         <th>Date Created</th>
         <th># of Visits</th>
+        <th>Unique Visits</th>
 
       </tr>
 
@@ -43,6 +44,7 @@
           <td><%= key[1].url %></td>
           <td><%= key[1].dateCreated %></td>
           <td><%= key[1].visits %> </td>
+          <td><%= key[1].uniqueVisits.length %> </td>
           <td><a href="/urls/<%= key[0] %>" class="btn btn-info" style="width:120px"> Edit </a></td>
           <td><button type="submit" class="btn btn-danger" style="width:120px" > Delete </button></td>
           </form>
