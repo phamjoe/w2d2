@@ -12,15 +12,16 @@ let urlDatabase = {
     url: 'http://www.lighthouselabs.ca',
     user_id: 'userRandomID',
     visits : 0,
-    uniqueVisits : 0,
-    allVisits : []
+    allVisits : [],
+    dateCreated : getDate()
+
   },
   '9sm5xK': {
     url: 'http://www.google.com',
     user_id: 'user2RandomID',
     visits : 0,
-    uniqueVisits : 0,
-    allVisits : []
+    allVisits : [],
+    dateCreated : getDate()
   }
 };
 
@@ -45,8 +46,8 @@ function urlsForUser(id) {
         url: urlDatabase[shortURL].url,
         user_id: urlDatabase[shortURL].user_id,
         visits : urlDatabase[shortURL].visits || 0,
-        uniqueVisits : urlDatabase[shortURL].uniqueVisits || 0,
-        allVisits : urlDatabase[shortURL].allVisits || []
+        allVisits : urlDatabase[shortURL].allVisits || [],
+        dateCreated : urlDatabase[shortURL].dateCreated
       };
     }
   }
@@ -115,16 +116,17 @@ app.get('/urls/login', (req, res) => {
 // logout and clear cookies
 app.post('/logout', (req, res) => {
   req.session = null;
-  res.redirect('/urls');
+  res.redirect(302, '/urls/login');
 });
 
 app.get('/', (req, res) => {
-  res.redirect(301, `/urls`);
+  res.redirect(302, '/urls/login');
 });
 
 app.get('/urls', (req, res) => {
   if (!req.session.user_id) {
     res.redirect('/urls/login');
+    return;
   }
   let templateVars = {
     user: users[req.session.user_id],
@@ -133,7 +135,7 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-//  page to add new link
+//  page to add URL
 app.get('/urls/new', (req, res) => {
   if (!req.session.user_id) {
     res.redirect('/urls/login');
@@ -147,13 +149,36 @@ app.get('/urls/new', (req, res) => {
   }
 });
 
+//  add new URL
+app.post('/urls/', (req, res) => {
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = {
+    url: req.body.longURL,
+    user_id: req.session.user_id,
+    visits : 0,
+    dateCreated : getDate()
+  };
+  res.redirect(302, `/urls/${shortURL}`);
+});
+
+//  update URL info
+app.put('/urls/:id', (req, res) => {
+  urlDatabase[req.params.id].url = req.body.longURL;
+  res.redirect(302, `/urls/${req.params.id}`);
+});
+
 //  register
 app.get('/urls/register', (req, res) => {
+  if(!req.session.user_id){
   let templateVars = {
     user: users[req.session.user_id]
   };
 
   res.render('urls_register', templateVars);
+  }
+  else{
+    res.redirect('/urls');
+  }
 });
 
 app.post('/register', (req, res) => {
@@ -170,7 +195,7 @@ app.post('/register', (req, res) => {
       password: hashedPassword
     };
     req.session.user_id = new_id;
-    res.redirect(301, '/urls');
+    res.redirect(302, '/urls');
   }
 });
 
@@ -187,23 +212,7 @@ app.get('/urls/:id', (req, res) => {
 //  delete given the short url id
 app.delete('/urls/:id/delete', (req, res) => {
   delete urlDatabase[req.params.id];
-  res.redirect(301, '/urls');
-});
-
-//  add new URL
-app.post('/urls/', (req, res) => {
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = {
-    url: req.body.longURL,
-    user_id: req.session.user_id
-  };
-  res.redirect(301, `/urls/${shortURL}`);
-});
-
-//  update URL info
-app.put('/urls/:id', (req, res) => {
-  urlDatabase[req.params.id].url = req.body.longURL;
-  res.redirect(301, `/urls/${req.params.id}`);
+  res.redirect(302, '/urls');
 });
 
 //  redirect to long URL
@@ -224,4 +233,3 @@ app.get('/u/:shortURL', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Tiny App listening on port ${PORT}!`);
 });
-
