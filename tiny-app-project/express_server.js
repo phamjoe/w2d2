@@ -13,6 +13,7 @@ let urlDatabase = {
     user_id: 'userRandomID',
     visits: 0,
     allVisits: [],
+    uniqueVisits: [],
     dateCreated: getDate()
   },
   '9sm5xK': {
@@ -20,6 +21,7 @@ let urlDatabase = {
     user_id: 'user2RandomID',
     visits: 0,
     allVisits: [],
+    uniqueVisits: [],
     dateCreated: getDate()
   }
 };
@@ -46,6 +48,7 @@ function urlsForUser(id) {
         user_id: urlDatabase[shortURL].user_id,
         visits: urlDatabase[shortURL].visits || 0,
         allVisits: urlDatabase[shortURL].allVisits || [],
+        uniqueVisits: urlDatabase[shortURL].uniqueVisits || [],
         dateCreated: urlDatabase[shortURL].dateCreated
       };
     }
@@ -154,6 +157,7 @@ app.post('/urls/', (req, res) => {
     url: req.body.longURL,
     user_id: req.session.user_id,
     visits: 0,
+    uniqueVisits: [],
     dateCreated: getDate()
   };
   res.redirect(302, `/urls/${shortURL}`);
@@ -214,6 +218,7 @@ app.delete('/urls/:id/delete', (req, res) => {
 //  redirect to long URL
 app.get('/u/:shortURL', (req, res) => {
   let longURL = urlDatabase[req.params.shortURL].url;
+  // get all visits
   urlDatabase[req.params.shortURL].visits = urlDatabase[req.params.shortURL].visits + 1 || 0;
   if (!urlDatabase[req.params.shortURL].allVisits) {
     urlDatabase[req.params.shortURL].allVisits = [];
@@ -222,6 +227,10 @@ app.get('/u/:shortURL', (req, res) => {
     user_id: getUserID(users[req.session.user_id]),
     date: getDate()
   });
+  // get unique visits
+  urlDatabase[req.params.shortURL].uniqueVisits.push(getUserID(users[req.session.user_id]));
+  let unique = urlDatabase[req.params.shortURL].uniqueVisits.filter((v, i, a) => a.indexOf(v) === i);
+  urlDatabase[req.params.shortURL].uniqueVisits = unique;
 
   res.redirect(urlDatabase[req.params.shortURL].url);
 });
@@ -229,3 +238,4 @@ app.get('/u/:shortURL', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Tiny App listening on port ${PORT}!`);
 });
+
