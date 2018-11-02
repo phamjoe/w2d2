@@ -9,6 +9,21 @@
 <header>
     <% include ./partials/_header%>
 </header>
+<style>
+  table{
+    margin-top: 15px;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 8px;
+    margin: 50%;
+    font-size: 10pt;
+  }
+
+</style>
 <body style="font-size:16px; padding:50px;">
     <% if( urls[shortURL]) {%>
     <form action="/urls/<%= shortURL %>?_method=PUT" method="POST">
@@ -17,8 +32,26 @@
       <input id="longURL" type="text" name="longURL" value="<%=urls[shortURL].url %>" autofocus style="width: 300px">
       <button type="submit" class="btn btn-info">Update</button>
     </form>
+    <i><p style="margin-top: 10px">Times visited: <%= urls[shortURL].visits %> </p></i>
+    <i><p style="margin-top: 5px">Unique visits: <%= urls[shortURL].uniqueVisits %> </p></i>
+
+    <table>
+      <caption>All Visits</caption>
+    <tr>
+      <th>User ID</th>
+      <th>Date Visited</th>
+    </tr>
+          <% for(let visit of urls[shortURL].allVisits) { %>
+           <tr>
+                <td><%= visit.user_id %></td>
+                <td><%= visit.date %></td>
+          <% } %>
+           </tr>
+
+      </table>
+
      <% } else{ %>
-    <p> Please Log in </p>
+      <h2><b>Unauthorized Access  </b></h2>
      <% } %>
 
 </body>

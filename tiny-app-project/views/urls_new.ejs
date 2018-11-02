@@ -8,9 +8,11 @@
 </head>
   <body style="font-size:16px; padding:50px;">
     <% include ./partials/_header %>
-    <form action="/urls/" method="POST" style="margin:150px;>
+     <h1>Shorten URL</h1>
+    <form action="/urls/" method="POST" >
+
       <label for="longURL">Enter a URL:</label>
-      <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+      <input id="longURL" type="text" name="longURL" value="http://" autofocus style="width: 20%">
       <input type="submit" value="Submit" class="btn btn-info">
 
     </form>

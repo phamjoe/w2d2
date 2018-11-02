@@ -10,11 +10,17 @@ app.set('view engine', 'ejs');
 let urlDatabase = {
   'b2xVn2': {
     url: 'http://www.lighthouselabs.ca',
-    user_id: 'userRandomID'
+    user_id: 'userRandomID',
+    visits : 0,
+    uniqueVisits : 0,
+    allVisits : []
   },
   '9sm5xK': {
     url: 'http://www.google.com',
-    user_id: 'user2RandomID'
+    user_id: 'user2RandomID',
+    visits : 0,
+    uniqueVisits : 0,
+    allVisits : []
   }
 };
 
@@ -37,7 +43,10 @@ function urlsForUser(id) {
     if (urlDatabase[shortURL].user_id === id) {
       usersURL[shortURL] = {
         url: urlDatabase[shortURL].url,
-        user_id: urlDatabase[shortURL].user_id
+        user_id: urlDatabase[shortURL].user_id,
+        visits : urlDatabase[shortURL].visits || 0,
+        uniqueVisits : urlDatabase[shortURL].uniqueVisits || 0,
+        allVisits : urlDatabase[shortURL].allVisits || []
       };
     }
   }
@@ -147,6 +156,7 @@ app.get('/urls/:id', (req, res) => {
     urls: urlsForUser(req.session.user_id),
     shortURL: req.params.id
   };
+  console.log(templateVars.urls);
   res.render('urls_show', templateVars);
 });
 
@@ -168,6 +178,7 @@ app.post('/urls/', (req, res) => {
 
 //  update URL info
 app.put('/urls/:id', (req, res) => {
+  console.log();
   urlDatabase[req.params.id].url = req.body.longURL;
   res.redirect(301, `/urls/${req.params.id}`);
 });
@@ -175,6 +186,16 @@ app.put('/urls/:id', (req, res) => {
 //  redirect to long URL
 app.get('/u/:shortURL', (req, res) => {
   let longURL = urlDatabase[req.params.shortURL].url;
+  urlDatabase[req.params.shortURL].visits = ( urlDatabase[req.params.shortURL].visits)+1 || 0;
+  if(!urlDatabase[req.params.shortURL].allVisits){
+    urlDatabase[req.params.shortURL].allVisits = [];
+  }
+  console.log(users[req.session.user_id]);
+  urlDatabase[req.params.shortURL].allVisits.unshift({
+    user_id : getUserID(users[req.session.user_id]),
+    date : getDate()
+  });
+
   res.redirect(urlDatabase[req.params.shortURL].url);
 });
 
@@ -187,4 +208,22 @@ function generateRandomString() {
     .toString(36) //
     .substring(7);
   return random;
+}
+
+function getDate(){
+  var today = new Date();
+  var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  var dateTime = date+' '+time;
+
+  return dateTime;
+}
+
+function getUserID(userID){
+  if(userID){
+    return userID.id;
+  }
+  else{
+    return generateRandomString();
+  }
 }
