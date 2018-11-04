@@ -16,7 +16,8 @@ The app will allow users to shorten long URLs much like TinyURL.com and bit.ly d
 ## Getting Started
 
 - Install all dependencies (using the `npm install` command).
-- Run the development web server the `node express_server.js` command.
+- Run the development web server the `npm start` command.
+- Open browser to localhost:8080/ to begin
 
 ## Features
 - Register an account to be able to shorten URLs
